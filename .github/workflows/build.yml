@@ -57,7 +57,7 @@ jobs:
         export DEVKITPRO=/opt/devkitpro
         export DEVKITARM=$DEVKITPRO/devkitARM
         export PATH=$PATH:$DEVKITARM/bin
-        make -f Makefile.switch
+        make -f Makefile.switch ARCH=arm64
 
     - name: Upload Nintendo Switch Homebrew artifact
       uses: actions/upload-artifact@v2
