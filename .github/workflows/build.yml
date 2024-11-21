@@ -9,8 +9,8 @@ on:
       - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-windows:
+    runs-on: windows-latest
 
     steps:
     - name: Checkout repository
@@ -33,12 +33,64 @@ jobs:
         cmake -G "Visual Studio 16 2019" ..
         cmake --build . --config Release
 
+    - name: Upload Lime3DS artifact for Windows
+      uses: actions/upload-artifact@v2
+      with:
+        name: lime3ds-windows
+        path: build/
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
     - name: Build Lime3DS for MacOS
       run: |
         mkdir -p build
         cd build
         cmake -G "Xcode" ..
         cmake --build . --config Release
+
+    - name: Upload Lime3DS artifact for MacOS
+      uses: actions/upload-artifact@v2
+      with:
+        name: lime3ds-macos
+        path: build/
+
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v2
+      with:
+        api-level: 30
+        ndk-version: 21.4.7075529
 
     - name: Build Lime3DS for Android
       run: |
@@ -47,13 +99,13 @@ jobs:
         cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a ..
         cmake --build . --config Release
 
-    - name: Upload Lime3DS artifacts
+    - name: Upload Lime3DS artifact for Android
       uses: actions/upload-artifact@v2
       with:
-        name: lime3ds
+        name: lime3ds-android
         path: build/
 
-  switch-build:
+  build-switch:
     runs-on: ubuntu-latest
 
     steps:
